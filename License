@@ -1,0 +1,10 @@
+Double Metaphone Copyright © 1998, 1999 by Lawrence Philips
+
+Modified by Kevin Atkinson; ported to Go by Ron Charlton 2022-12-04.
+
+This is free software: you can redistribute it, modify it, or both,
+freely.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
