@@ -3,7 +3,10 @@
 // Ported by Ron Charlton from http://aspell.net/metaphone/dmetaph.cpp on
 // 2022-12-04. dmetaph.cpp is open source, as is this Go port.
 //
-// $Id: metaphone.go,v 3.20 2022-12-14 11:11:15-05 ron Exp $
+// See the original Dr.Dobb's article by Lawrence Philips at
+// https://drdobbs.com/the-double-metaphone-search-algorithm/184401251?pgno=2
+//
+// $Id: metaphone.go,v 3.22 2022-12-15 09:34:52-05 ron Exp $
 
 ///
 // From metaph.cpp:
@@ -19,7 +22,7 @@ package metaphone
 
 import "strings"
 
-// DoubleMetaphone returns a primary and secondary code for word.
+// DoubleMetaphone returns primary and secondary codes for word.
 // Metaph and metaph2 are each limited to maxlength characters.
 // The original Double Metaphone code set maxlength to 4.
 // Non-alphabetic characters in word are ignored.  Upper/Lower case distinctions
@@ -33,9 +36,11 @@ import "strings"
 //	// ...
 //	m, m2 := metaphone.DoubleMetaphone("knewmoanya", 6)
 //	n, n2 := metaphone.DoubleMetaphone("pneumonia", 6)
-//	// m is "NMN". n also is "NMN".  The maximum allowed length
+//	// m is "NMN". n also is "NMN".  The maximum allowed length for each
 //	// of m, m2, n and n2 is 6.
-//	if m == n || m == n2 || m2 == n || len(m2) > 0 && m2 == n2 { // match }
+//	if m == n || m == n2 || m2 == n || len(m2) > 0 && m2 == n2 {
+//	  // match
+//	}
 //	// ...
 func DoubleMetaphone(word string, maxlength int) (metaph, metaph2 string) {
 	const pad = "     " // 5 spaces
@@ -75,7 +80,7 @@ func DoubleMetaphone(word string, maxlength int) (metaph, metaph2 string) {
 	// non-empty argument is appended to secondary.
 	MetaphAdd := func(s ...string) {
 		if len(s) < 1 || len(s) > 2 {
-			panic("one or two arguments are required for MetaphAdd")
+			panic("MetaphAdd requires one or two arguments")
 		}
 		main := s[0]
 		primary.WriteString(main)
