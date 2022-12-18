@@ -21,7 +21,7 @@ import (
 	"testing"
 )
 
-var rcs_id_mt string = "$Id: metaphone_test.go,v 1.10 2022-12-14 12:51:20-05 ron Exp $"
+var rcs_id_mt string = "$Id: metaphone_test.go,v 1.11 2022-12-17 23:29:19-05 ron Exp $"
 
 func TestMetaphone(t *testing.T) {
 	var words, want []string
@@ -73,4 +73,15 @@ func readFileLines(name string) (lines []string, err error) {
 	}
 	lines = strings.Split(string(b), "\n")
 	return
+}
+
+func TestConvenience(t *testing.T) {
+	metaph, err := NewMetaphMapFromFile("testInputData.txt.gz", 6)
+	if err != nil {
+		t.Fatalf("%v", err)
+	}
+	words := metaph.MatchWord("knewmoania")
+	if len(words) != 11 {
+		t.Errorf("got: %d;  want: 11", len(words))
+	}
 }

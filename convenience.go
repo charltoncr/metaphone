@@ -1,9 +1,17 @@
 // Convenience functions that use DoubleMetaphone.
 // Created 2022-12-16 by Ron Charlton and placed in the public domain.
 //
-// $Id: convenience.go,v 1.13 2022-12-17 13:43:38-05 ron Exp $
+// $Id: convenience.go,v 1.17 2022-12-17 23:13:23-05 ron Exp $
 
 package metaphone
+
+import (
+	"compress/gzip"
+	"fmt"
+	"io"
+	"os"
+	"strings"
+)
 
 // MetaphMap defines a MetaphMap for a wordlist and maximum metaph/metaph2
 // length from DoubleMetaphone.
@@ -36,6 +44,40 @@ func NewMetaphMap(wordlist []string, maxLen int) *MetaphMap {
 	}
 }
 
+// NewMetaphMapFromFile returns a MetaphMap made from a file containing a
+// word list, and using a maximum length for the DoubleMetaphone return values.
+// the file can be gzipped.
+// The MetaphMap can be used with MatchWord to find all words in the
+// MetaphMap that sound like a given word or misspelling.
+// Argument maxLen is 4 in the original Double Metaphone algorithm.
+// Case and non-alphabetic characters in the file are ignored.
+func NewMetaphMapFromFile(fileName string, maxLen int) (
+	metaph *MetaphMap, err error) {
+	var b []byte
+	var r io.Reader
+	var fp *os.File
+
+	if fp, err = os.Open(fileName); err != nil {
+		err = fmt.Errorf("trying to open file %s: %v", fileName, err)
+		return
+	}
+	defer fp.Close()
+	r = fp
+	if strings.HasSuffix(fileName, ".gz") {
+		if r, err = gzip.NewReader(r); err != nil {
+			err = fmt.Errorf(
+				"trying to make a gzip reader for file %s: %v", fileName, err)
+			return
+		}
+	}
+	if b, err = io.ReadAll(r); err != nil {
+		err = fmt.Errorf("trying to read word list file %s: %v", fileName, err)
+		return
+	}
+	lines := strings.Split(string(b), "\n")
+	return NewMetaphMap(lines, maxLen), err
+}
+
 // Len returns the number of sound-alike entries in metaph.
 func (metaph *MetaphMap) Len() int {
 	return len(metaph.mapper)
@@ -44,15 +86,16 @@ func (metaph *MetaphMap) Len() int {
 // MatchWord returns all words in metaph that sound like word.
 // Case and non-alphabetic characters in word are ignored.  Typical use:
 //
-//	import "fmt"
-//	import "metaphone"
-//	// ...
-//	// wordlist should contain all words in a comprehesive word list.
-//	metaphMap := metaphone.NewMetaphMap(wordlist, 4)
-//	matches := metaphMap.MatchWord("knewmoanya")
-//	for _, word = range matches {
-//		fmt.Println(word)
-//	}
+//		import "fmt"
+//		import "metaphone"
+//		// ...
+//		// File wordlistFileName should contain a comprehesive word
+//	 	// list, one word per line.
+//		metaphMap := metaphone.NewMetaphMapFromFile(wordlistFileName, 4)
+//		matches := metaphMap.MatchWord("knewmoanya")
+//		for _, word = range matches {
+//			fmt.Println(word)
+//		}
 func (metaph *MetaphMap) MatchWord(word string) (output []string) {
 	m, m2 := DoubleMetaphone(word, metaph.maxlen)
 	if len(m) > 0 {

@@ -23,15 +23,20 @@ if m == n || m == n2 || m2 == n || len(m2) > 0 && m2 == n2 {
 # Double Metaphone Convenience Functions
 
 - func NewMetaphMap(wordlist []string, maxLen int) *MetaphMap
+- func NewMetaphMapFromFile(fileName string, maxLen int) (*MetaphMap, error)
 - func (metaph *MetaphMap) MatchWord(word string) (output []string)
 - func (metaph *MetaphMap) Len() int
 
-NewMetaphMap returns a MetaphMap made from a wordlist and a maximum length
+**NewMetaphMap** returns a MetaphMap made from a wordlist and a maximum length
 for the DoubleMetaphone return values.
 
-MatchWord returns all words that sound like word. Case in word is ignored.
+**NewMetaphMapFromFile** returns a MetaphMap made from a word list file and
+a maximum length for the DoubleMetaphone return values.
 
-Len returns the number of sound-alike entries in the metaph sounds map.
+**MatchWord** returns all words in metaph that sound like word. Case in word
+is ignored.
+
+**Len** returns the number of sound-alike entries in the metaph sounds map.
 
 Example use:
 
@@ -39,8 +44,9 @@ Example use:
 import "fmt"
 import "github.com/charltoncr/metaphone"
 // ...
-// wordlist should contain all words in a comprehesive word list.
-metaphMap := metaphone.NewMetaphMap(wordlist, 4)
+// File wordlistFileName should contain a comprehesive word list
+// with one word per line.
+metaphMap := metaphone.NewMetaphMapFromFile(wordlistFileName, 4)
 matches := metaphMap.MatchWord("knewmoanya")
 for _, word = range matches {
     fmt.Println(word)
