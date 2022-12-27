@@ -1,7 +1,7 @@
 // Convenience functions that use DoubleMetaphone.
 // Created 2022-12-16 by Ron Charlton and placed in the public domain.
 //
-// $Id: convenience.go,v 1.17 2022-12-17 23:13:23-05 ron Exp $
+// $Id: convenience.go,v 1.20 2022-12-27 09:19:23-05 ron Exp $
 
 package metaphone
 
@@ -26,7 +26,8 @@ type MetaphMap struct {
 // The MetaphMap can be used with MatchWord to find all words in the
 // MetaphMap that sound like a given word or misspelling.
 // Argument maxLen is 4 in the original Double Metaphone algorithm.
-// Case is ignored in wordlist, as are non-alphabetic characters.
+// Case is ignored in the words in wordlist, as are non-alphabetic
+// characters.
 func NewMetaphMap(wordlist []string, maxLen int) *MetaphMap {
 	MMap := make(map[string][]string)
 	for _, word := range wordlist {
@@ -46,7 +47,7 @@ func NewMetaphMap(wordlist []string, maxLen int) *MetaphMap {
 
 // NewMetaphMapFromFile returns a MetaphMap made from a file containing a
 // word list, and using a maximum length for the DoubleMetaphone return values.
-// the file can be gzipped.
+// The file can be a gzipped file with its name ending with ".gz".
 // The MetaphMap can be used with MatchWord to find all words in the
 // MetaphMap that sound like a given word or misspelling.
 // Argument maxLen is 4 in the original Double Metaphone algorithm.
@@ -71,7 +72,7 @@ func NewMetaphMapFromFile(fileName string, maxLen int) (
 		}
 	}
 	if b, err = io.ReadAll(r); err != nil {
-		err = fmt.Errorf("trying to read word list file %s: %v", fileName, err)
+		err = fmt.Errorf("trying to read file %s: %v", fileName, err)
 		return
 	}
 	lines := strings.Split(string(b), "\n")
@@ -90,8 +91,8 @@ func (metaph *MetaphMap) Len() int {
 //		import "metaphone"
 //		// ...
 //		// File wordlistFileName should contain a comprehesive word
-//	 	// list, one word per line.
-//		metaphMap := metaphone.NewMetaphMapFromFile(wordlistFileName, 4)
+//	 	// list, one word per line.  Errors are ignored here.
+//		metaphMap, _ := metaphone.NewMetaphMapFromFile(wordlistFileName, 4)
 //		matches := metaphMap.MatchWord("knewmoanya")
 //		for _, word = range matches {
 //			fmt.Println(word)
@@ -108,10 +109,10 @@ func (metaph *MetaphMap) MatchWord(word string) (output []string) {
 	return
 }
 
-// removeDups removes duplicates within in.
-func removeDups(in []string) (out []string) {
+// removeDups removes duplicates within s.
+func removeDups(s []string) (out []string) {
 	m := make(map[string]struct{})
-	for _, w := range in {
+	for _, w := range s {
 		m[w] = struct{}{}
 	}
 	for o := range m {
